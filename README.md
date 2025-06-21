@@ -1,20 +1,58 @@
 # Ai_football_analyzer
 
-A brief description of your project goes here. Explain what it does, who it's for, and what problem it solves. This section should give visitors a quick overview of the project's purpose and key features.
+
+**AI Football Analyzer** is a real-time, intelligent football analysis system designed to analyze match visuals from **images** or **videos**. This tool empowers users to perform **detection**, **segmentation**, and **pose estimation** using cutting-edge deep learning models — all through an intuitive **Streamlit interface**.
 
 ---
+
+## 🌟 Key Features
+
+### 📸 Image Processing
+- Upload any football match image.
+- Choose between:
+  - **Object Detection**: Identify players, goalkeeper, ball.
+  - **Semantic Segmentation**: Differentiate regions (players, field, goalpost).
+  - **Pose Estimation**: Extract body landmarks of players.
+
+### 🎥 Video Analysis
+- Upload videos (ideally 30–60 seconds, bird’s-eye view).
+- Real-time inference using **OpenCV**.
+- Frame-by-frame analysis (every 30 frames) including:
+  - **Live Commentary** powered by GPT.
+  - **Player Detection & Pose Estimation**.
+  - **KDE Heatmaps** for movement distribution.
+
+### 📊 Field Analytics
+- Confidence adjustment trigger for bbox frames
+- Generate **KDE (Kernel Density Estimation) plots** of player density.
+- Visualize tactical spread and player activity on the pitch.
+
+---
+
+## 🚀 Technical Architecture
+
+| Module            | Technology                               |
+|------------------|-------------------------------------------|
+| Model Backbone    | **Merged YOLOv8 + YOLOv11** (for Detection, Pose, Segmentation) |
+| Interface         | **Streamlit**                            |
+| Real-time Vision  | **OpenCV**                               |
+| Audio Commentary  | **GPT + TTS (pyttsx3 or Coqui)**         |
+| Analytics Plots   | **Seaborn, Matplotlib**                  |
+
+---
+
 
 ## Getting Started
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-### Prerequisites
+### A) Prerequisites
 
 * **Git:** You must have Git installed to clone the repository. You can download it from [git-scm.com](https://git-scm.com/).
 * **Python 3.10:** This project requires Python version 3.10. You can download it from [python.org](https://www.python.org/downloads/release/python-3100/).
 * **NVIDIA GPU with CUDA 12.1 compatible drivers:** The specified PyTorch version is built for CUDA 12.1. Ensure your GPU drivers are up-to-date.
 
-### Installation & Setup
+### B) Installation & Setup
 
 Follow these steps to set up your local development environment.
 
@@ -66,30 +104,17 @@ Follow these steps to set up your local development environment.
 
 5.  **Install Other Requirements**
 
-    Create a `requirements.txt` file in your project's root directory. List all other Python dependencies in this file. For example:
-    
-    **requirements.txt:**
-    ```
-    streamlit
-    ultralytics
-    pandas
-    matplotlib
-    scikit-learn........
-    ```
-
-    Then, install these dependencies using pip:
     ```bash
     pip install -r requirements.txt
     ```
 
-## Usage
+## C) Usage
 
-To run the application, use the following command in your terminal:
+* To run the application, use the following command in your terminal:
 
-* 
 
     ```bash
-    python main.py --input data/my_input.csv --output results/
+   streamlit run main.py
     ```
 
 
