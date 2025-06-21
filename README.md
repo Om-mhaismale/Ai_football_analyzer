@@ -5,6 +5,14 @@
 
 ---
 
+<p align="center">
+  <img src="./images/streamlit_interface1.png" width="45%"/>
+  <img src="./images/streamlit_interface2.png" width="45%"/>
+  <br/>
+  <img src="./images/streamlit_interface3.png" width="45%"/>
+  <img src="./images/streamlit_interface4.png" width="45%"/>
+</p>
+
 ## 🌟 Key Features
 
 ### 📸 Image Processing
