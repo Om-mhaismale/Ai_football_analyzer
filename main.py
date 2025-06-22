@@ -6,7 +6,7 @@ import sys
 from ultralytics import YOLO 
 from PIL import Image
 from kdeplot import generate_kde_plot  
-from extract_positions import extract_positions
+from extract_positions import extract_positions, count_detected_objects
 from commentary_generator import generate_commentary
 from text_to_audio import generate_audio
 
@@ -123,11 +123,23 @@ if source_radio == IMAGE:
                 detect_btn = st.sidebar.button("Detect Objects")
                 commentary_btn = st.sidebar.button("Generate Commentary")
                 if detect_btn:
-                    result = model.predict(uploaded_image, conf = confidence_value)
+                    result = model.predict(uploaded_image, conf=confidence_value)
                     boxes = result[0].boxes
+                    # st.write("Detected class IDs:", [int(box.cls) for box in boxes])
                     result_plotted = result[0].plot()[:,:,::-1]
-                    st.image(result_plotted, caption = "Detected Image", use_container_width=True)
+                    st.image(result_plotted, caption="Detected Image", use_container_width=True)
                     st.session_state['last_image_result'] = result  # Save for commentary
+
+                    # Show detection summary
+                    positions = extract_positions(result)
+                    counts = count_detected_objects(result)
+                    st.markdown("**Detection Summary:**")
+                    st.write(f"Players: {counts['players']}")
+                    st.write(f"Goalkeepers: {counts['goalkeepers']}")
+                    st.write(f"Main Referees: {counts['main_referees']}")
+                    st.write(f"Side Referees: {counts['side_referees']}")
+                    st.write(f"Staff Members: {counts['staff_members']}")
+                    st.write(f"Ball detected: {'Yes' if counts['ball'] > 0 else 'No'}")
 
                     try:
                         with st.expander("Detection Results"):
@@ -167,6 +179,7 @@ elif source_radio == VIDEO:
             f.write(uploaded_video.read())
         detect_btn = st.sidebar.button("Detect Video Objects (Uploaded)")
         commentary_btn = st.sidebar.button("Generate Commentary (Uploaded Video)")
+        kde_btn = st.sidebar.button("Generate KDE Plot (Uploaded Video)")  # <-- Added to sidebar
         if detect_btn:
             try:
                 video_cap = cv2.VideoCapture(temp_video_path)
@@ -191,8 +204,11 @@ elif source_radio == VIDEO:
             results = st.session_state.get('video_results', [])
             if results:
                 for idx, result in enumerate(results):
+                    if idx == 0:
+                        continue  # Skip frame 0
                     if idx % 30 == 0:
                         positions = extract_positions(result)
+                        positions["frame_id"] = idx  # ✅ Add this line
                         commentary = generate_commentary(positions)
                         audio_file = generate_audio(commentary)
                         st.write(f"AI Commentary (frame {idx}):")
@@ -200,7 +216,8 @@ elif source_radio == VIDEO:
                         st.audio(audio_file, format='audio/wav')
             else:
                 st.warning("Please run detection first.")
-        if st.button("Generate KDE Plot (Uploaded Video)"):
+
+        if kde_btn:
             with st.spinner("Generating KDE plot..."):
                 fig = generate_kde_plot(temp_video_path, str(model_path))
                 if fig:
@@ -215,6 +232,7 @@ elif source_radio == VIDEO:
                 st.video(video_bytes)
             detect_btn = st.sidebar.button("Detect Video Objects")
             commentary_btn = st.sidebar.button("Generate Commentary (Sample Video)")
+            kde_btn = st.sidebar.button("Generate KDE Plot (Sample Video)")  # <-- Added to sidebar
             if detect_btn:
                 try:
                     video_cap = cv2.VideoCapture(video_path)
@@ -241,6 +259,7 @@ elif source_radio == VIDEO:
                     for idx, result in enumerate(results):
                         if idx % 30 == 0:
                             positions = extract_positions(result)
+                            positions["frame_id"] = idx  # ✅ Add this line
                             commentary = generate_commentary(positions)
                             audio_file = generate_audio(commentary)
                             st.write(f"AI Commentary (frame {idx}):")
@@ -248,10 +267,11 @@ elif source_radio == VIDEO:
                             st.audio(audio_file, format='audio/wav')
                 else:
                     st.warning("Please run detection first.")
-        if st.button("Generate KDE Plot (Sample Video)"):
-            with st.spinner("Generating KDE plot..."):
-                fig = generate_kde_plot(video_path, str(model_path))
-                if fig:
-                    st.pyplot(fig)
-                else:
-                    st.error("Failed to generate KDE plot.")
+
+            if kde_btn:
+                with st.spinner("Generating KDE plot..."):
+                    fig = generate_kde_plot(video_path, str(model_path))
+                    if fig:
+                        st.pyplot(fig)
+                    else:
+                        st.error("Failed to generate KDE plot.")
